@@ -9,7 +9,7 @@ public class PlayerScript : MonoBehaviour {
 
 	public float lookSensitivity;
 	public GameObject canvas;
-	public GameObject soldierPrefab;
+	public GameObject[] unitPrefabs;
 	public GameObject commandMarkPrefab;
 	public GameObject dragSelectionPanelPrefab;
 	public UnityEngine.UI.Text mouseModeText;
@@ -43,7 +43,7 @@ public class PlayerScript : MonoBehaviour {
 		mouseDownPos = Vector3.zero;
 		dragSelecting = false;
 		dragSelectionPanel = null;
-		mouseModeNames = new string[] {"Unit Placement", "Unit Selection"};
+		mouseModeNames = new string[] {"Soldier Placement", "Armored Soldier Placement", "Unit Selection"};
 	}
 
 	void Update () {
@@ -83,9 +83,9 @@ public class PlayerScript : MonoBehaviour {
 		}
 
 		// Mouse mode interactions
-		if (mouseMode == 0) {
+		if (mouseMode < 2) {
 			placementModeUpdate();
-		} else if (mouseMode == 1) {
+		} else {
 			selectionModeUpdate();
 		}
 	}
@@ -98,7 +98,10 @@ public class PlayerScript : MonoBehaviour {
 			RaycastHit hit;
 
 			if (Physics.Raycast(lookRay, out hit)) {
-				GameObject newUnit = Instantiate(soldierPrefab);
+
+				// This method of placing units is only temporary
+				// There will be a better way to select unit to place other than mouseMode in the future
+				GameObject newUnit = Instantiate(unitPrefabs[mouseMode % unitPrefabs.Length]);
 				newUnit.transform.position = hit.point;
 				ownedUnits.Add(newUnit.GetComponent<Unit>());
 			}

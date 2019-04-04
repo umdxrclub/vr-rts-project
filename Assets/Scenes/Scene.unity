@@ -708,8 +708,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lookSensitivity: 2
   canvas: {fileID: 1745583458}
-  soldierPrefab: {fileID: 1179969706707787445, guid: 54c23202562b4b345bd5afedaf2b6537,
-    type: 3}
+  unitPrefabs:
+  - {fileID: 3201372530108373645, guid: 54c23202562b4b345bd5afedaf2b6537, type: 3}
+  - {fileID: 4654093459966892551, guid: 327d0a07af55cf4409290aa85437b89d, type: 3}
   commandMarkPrefab: {fileID: 8015458449541186505, guid: 8fa5aa4950f261c44bbbb00e7aa90117,
     type: 3}
   dragSelectionPanelPrefab: {fileID: 5764813181574538790, guid: ac111201df6edd54cbf8d49e958553d6,
@@ -1058,7 +1059,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Unit Placement
+  m_Text: Soldier Placement
 --- !u!222 &1318228865
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1285,7 +1286,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 29.299988}
-  m_SizeDelta: {x: 227.70001, y: 58.600006}
+  m_SizeDelta: {x: 350, y: 58.600006}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1649717869
 MonoBehaviour:

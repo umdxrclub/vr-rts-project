@@ -6,22 +6,24 @@ using UnityEngine;
 // Date: March 2019
 
 public class Unit : MonoBehaviour {
+
 	public float speed;
+
 	public MeshRenderer selectionCircle;
 	public Material themeColor;
 	
-	private CharacterController cc;
-	private bool moving;
-	private Vector3 targetPos;
-	private float targetAngle;
-	private LineRenderer line;
+	protected CharacterController cc;
+	protected bool moving;
+	protected Vector3 targetPos;
+	protected float targetAngle;
+	protected LineRenderer line;
 	
     void Start() {
+
+		// Default speed for units
 		speed = 1f;
-		cc = GetComponent<CharacterController>();
-		moving = false;
-		targetPos = Vector3.zero;
-		targetAngle = 0f;
+
+		setUpUnit();
     }
 
     void Update() {
@@ -44,6 +46,14 @@ public class Unit : MonoBehaviour {
 			}
 		}
     }
+
+	// Called on start by every unit
+	protected void setUpUnit() {
+		cc = GetComponent<CharacterController>();
+		moving = false;
+		targetPos = Vector3.zero;
+		targetAngle = 0f;
+	}
 
 	public void moveTo(Vector3 position) {
 		moving = true;
