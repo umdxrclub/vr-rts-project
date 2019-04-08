@@ -7,8 +7,6 @@ With this project we are creating a real time strategy (RTS) game which will be 
 * Contributors: Atul Bharati, Irene Li, Rodolfo Castro, Paul Armstrong
 * Time Frame: Spring 2019 Semester
 
-![vr-rts-screenshot](https://i.imgur.com/umYBiyF.png)
-
 ## Short term plans
 
 * Add some functionality for creating buildings
@@ -25,4 +23,6 @@ With this project we are creating a real time strategy (RTS) game which will be 
 * Experiment with expanding RTS game mechanics into the 3rd dimension (maybe into space?)
 * Potentially work on networked multiplayer support (could be difficult)
 
+## Screenshot
 
+![vr-rts-screenshot](https://i.imgur.com/umYBiyF.png)
