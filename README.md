@@ -1,5 +1,7 @@
 # Virtual Reality Real Time Strategy Game Project
 
+![vr-rts-screenshot](https://i.imgur.com/4XiHR5o.png)
+
 ## About
 
 With this project we are creating a real time strategy (RTS) game which will be played in virtual reality (VR). We hope to take advantage of the great immersion and unique control scheme of VR to create a unique RTS experience.
@@ -23,6 +25,3 @@ With this project we are creating a real time strategy (RTS) game which will be 
 * Experiment with expanding RTS game mechanics into the 3rd dimension (maybe into space?)
 * Potentially work on networked multiplayer support (could be difficult)
 
-## Screenshot
-
-![vr-rts-screenshot](https://i.imgur.com/umYBiyF.png)
