@@ -7,21 +7,24 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour {
 
-	public float speed;
-
 	public MeshRenderer selectionCircle;
 	public Material themeColor;
+
+	protected float speed;
+	protected float maxHealth;
 	
 	protected CharacterController cc;
 	protected bool moving;
 	protected Vector3 targetPos;
 	protected float targetAngle;
 	protected LineRenderer line;
+	protected float health;
 	
     void Start() {
 
-		// Default speed for units
+		// Default stats for units
 		speed = 1f;
+		maxHealth = 1;
 
 		setUpUnit();
     }
@@ -53,13 +56,18 @@ public class Unit : MonoBehaviour {
 		moving = false;
 		targetPos = Vector3.zero;
 		targetAngle = 0f;
+		health = maxHealth;
 	}
 
+	// Function called externally to tell the unit where to go
 	public void moveTo(Vector3 position) {
+
 		moving = true;
 		targetPos = position;
 		targetAngle = Mathf.Rad2Deg*Mathf.Atan2(targetPos.x-transform.position.x, targetPos.z-transform.position.z);
-		Destroy(line);
+		if (line != null && line.gameObject != null) {
+			Destroy(line.gameObject);
+		}
 		GameObject lineObj = new GameObject();
 		lineObj.AddComponent<LineRenderer>();
 		lineObj.GetComponent<Renderer>().material = themeColor;

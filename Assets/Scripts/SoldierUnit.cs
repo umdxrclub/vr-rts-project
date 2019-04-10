@@ -6,7 +6,7 @@ public class SoldierUnit : Unit {
 	
 	void Start() {
 
-		// Override the normal speed
+		// Override the default Unit stats
 		speed = 1.25f;
 
 		setUpUnit();

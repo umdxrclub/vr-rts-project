@@ -6,8 +6,9 @@ public class ArmoredSoldierUnit : Unit {
 	
 	void Start() {
 
-		// Override the normal speed
+		// Override the default Unit stats
 		speed = 0.75f;
+		maxHealth = 2;
 
 		setUpUnit();
 	}

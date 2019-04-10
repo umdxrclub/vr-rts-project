@@ -43,7 +43,12 @@ public class PlayerScript : MonoBehaviour {
 		mouseDownPos = Vector3.zero;
 		dragSelecting = false;
 		dragSelectionPanel = null;
-		mouseModeNames = new string[] {"Soldier Placement", "Armored Soldier Placement", "Unit Selection"};
+		mouseModeNames = new string[unitPrefabs.Length+1];
+		for (int i = 0; i < unitPrefabs.Length; i++) {
+			mouseModeNames[i] = unitPrefabs[i].name + " Placement";
+		}
+		mouseModeNames[unitPrefabs.Length] = "Unit Selection";
+		mouseModeText.text = mouseModeNames[mouseMode];
 	}
 
 	void Update () {
@@ -73,7 +78,7 @@ public class PlayerScript : MonoBehaviour {
 
 		// Mouse mode switch and mouse down variables
 		if (Input.mouseScrollDelta.y != 0) {
-			mouseMode = safeMod(mouseMode + (int)Input.mouseScrollDelta.y, mouseModeNames.Length);
+			mouseMode = safeMod(mouseMode + (int)Input.mouseScrollDelta.y, unitPrefabs.Length + 1);
 			mouseModeText.text = mouseModeNames[mouseMode];
 		}
 
@@ -83,11 +88,16 @@ public class PlayerScript : MonoBehaviour {
 		}
 
 		// Mouse mode interactions
-		if (mouseMode < 2) {
+		if (mouseMode < unitPrefabs.Length) {
 			placementModeUpdate();
 		} else {
 			selectionModeUpdate();
 		}
+	}
+
+	// Public function for adding a unit to the player's ownedUnits
+	public void addOwnedUnit(Unit unit) {
+		ownedUnits.Add(unit);
 	}
 
 	// Function to process the placement mode for each update it is active
@@ -100,7 +110,7 @@ public class PlayerScript : MonoBehaviour {
 			if (Physics.Raycast(lookRay, out hit)) {
 
 				// This method of placing units is only temporary
-				// There will be a better way to select unit to place other than mouseMode in the future
+				// There will be a better way to place units other than mouseMode in the future
 				GameObject newUnit = Instantiate(unitPrefabs[mouseMode % unitPrefabs.Length]);
 				newUnit.transform.position = hit.point;
 				ownedUnits.Add(newUnit.GetComponent<Unit>());
@@ -175,15 +185,10 @@ public class PlayerScript : MonoBehaviour {
 					clearSelectedUnits();
 				}
 
-				if (selectedUnits.Count == 0) {
+				if (!selectedUnits.Contains(hitUnit)) {
 					addSelectedUnit(hitUnit);
 				} else {
-
-					if (!selectedUnits.Contains(hitUnit)) {
-						addSelectedUnit(hitUnit);
-					} else {
-						removeSelectedUnit(hitUnit);
-					}
+					removeSelectedUnit(hitUnit);
 				}
 			} else {
 				commandMovement();
