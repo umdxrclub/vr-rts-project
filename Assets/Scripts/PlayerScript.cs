@@ -9,7 +9,6 @@ public class PlayerScript : MonoBehaviour {
 
 	public float lookSensitivity;
 	public GameObject canvas;
-	public GameObject[] unitPrefabs;
 	public GameObject commandMarkPrefab;
 	public GameObject dragSelectionPanelPrefab;
 	public UnityEngine.UI.Text mouseModeText;
@@ -43,12 +42,6 @@ public class PlayerScript : MonoBehaviour {
 		mouseDownPos = Vector3.zero;
 		dragSelecting = false;
 		dragSelectionPanel = null;
-		mouseModeNames = new string[unitPrefabs.Length+1];
-		for (int i = 0; i < unitPrefabs.Length; i++) {
-			mouseModeNames[i] = unitPrefabs[i].name + " Placement";
-		}
-		mouseModeNames[unitPrefabs.Length] = "Unit Selection";
-		mouseModeText.text = mouseModeNames[mouseMode];
 	}
 
 	void Update () {
@@ -76,48 +69,18 @@ public class PlayerScript : MonoBehaviour {
 			clearSelectedUnits();
 		}
 
-		// Mouse mode switch and mouse down variables
-		if (Input.mouseScrollDelta.y != 0) {
-			mouseMode = safeMod(mouseMode + (int)Input.mouseScrollDelta.y, unitPrefabs.Length + 1);
-			mouseModeText.text = mouseModeNames[mouseMode];
-		}
-
 		if (Input.GetMouseButtonDown(0)) {
 			mouseDownTime = Time.time;
 			mouseDownPos = Input.mousePosition;
 		}
 
-		// Mouse mode interactions
-		if (mouseMode < unitPrefabs.Length) {
-			placementModeUpdate();
-		} else {
-			selectionModeUpdate();
-		}
+		selectionModeUpdate();
 	}
 
 	// Public function for adding a unit to the player's ownedUnits
 	public void addOwnedUnit(Unit unit) {
 		ownedUnits.Add(unit);
 	}
-
-	// Function to process the placement mode for each update it is active
-	private void placementModeUpdate() {
-
-		if (Input.GetMouseButtonDown(0)) {
-			Ray lookRay = head.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-			RaycastHit hit;
-
-			if (Physics.Raycast(lookRay, out hit)) {
-
-				// This method of placing units is only temporary
-				// There will be a better way to place units other than mouseMode in the future
-				GameObject newUnit = Instantiate(unitPrefabs[mouseMode % unitPrefabs.Length]);
-				newUnit.transform.position = hit.point;
-				ownedUnits.Add(newUnit.GetComponent<Unit>());
-			}
-		}
-	}
-
 
 	// Function to process the selection mode for each update it is active
 	private void selectionModeUpdate() {
@@ -176,8 +139,15 @@ public class PlayerScript : MonoBehaviour {
 		Ray lookRay = head.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 		if (Physics.Raycast(lookRay, out hit)) {
-			Unit hitUnit = getUnitFromChildTransform(hit.transform);
 
+			// If it hits a factory, open the factory menu and return
+			Factory hitFactory = getComponentInOrParent<Factory>(hit.transform);
+			if (hitFactory != null) {
+				hitFactory.openMenu();
+				return;
+			}
+
+			Unit hitUnit = getComponentInOrParent<Unit>(hit.transform);
 			if (ownedUnits.Contains(hitUnit)) {
 
 				// If left click is pressed, and left control isn't held, reset the selection
@@ -234,12 +204,12 @@ public class PlayerScript : MonoBehaviour {
 		selectedUnits.Clear();
 	}
 
-	// Helper function for finding the unit which the hit transform belongs to
-	private Unit getUnitFromChildTransform(Transform curr) {
-		while (curr != null && curr.GetComponent<Unit>() == null) {
+	// Helper function for finding the specified component in curr or a parent transform
+	private T getComponentInOrParent<T>(Transform curr) {
+		while (curr != null && curr.GetComponent<T>() == null) {
 			curr = curr.parent;
 		}
-		return curr == null ? null : curr.GetComponent<Unit>();
+		return curr == null ? default(T) : curr.GetComponent<T>();
 	}
 
 	// Helper function does integer mod with expected behavior for negative m

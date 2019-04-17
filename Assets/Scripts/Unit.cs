@@ -47,6 +47,8 @@ public class Unit : MonoBehaviour {
 				moving = false;
 				Destroy(line.gameObject);
 			}
+		} else if (!cc.isGrounded) {
+			cc.Move(Vector3.down * speed *  Time.deltaTime);
 		}
     }
 
