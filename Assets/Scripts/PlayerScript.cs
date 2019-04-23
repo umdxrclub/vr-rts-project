@@ -12,6 +12,7 @@ public class PlayerScript : MonoBehaviour {
 	public GameObject commandMarkPrefab;
 	public GameObject dragSelectionPanelPrefab;
 	public UnityEngine.UI.Text mouseModeText;
+	public Camera camera;
 
 	private Transform head;
 	private CharacterController cc;
@@ -31,6 +32,7 @@ public class PlayerScript : MonoBehaviour {
 
 		lookSensitivity = 2f;
 		head = transform.Find("Head");
+		camera = head.GetComponent<Camera>();
 		cc = GetComponent<CharacterController>();
 		freeLooking = false;
 		walkSpeed = 5f;
@@ -113,7 +115,7 @@ public class PlayerScript : MonoBehaviour {
 					new Vector2(right - Screen.width, top - Screen.height);
 
 			foreach (Unit unit in ownedUnits) {
-				Vector3 screenPos = head.GetComponent<Camera>().WorldToScreenPoint(unit.transform.position);
+				Vector3 screenPos = camera.WorldToScreenPoint(unit.transform.position);
 				if (left < screenPos.x && screenPos.x < right && bottom < screenPos.y && screenPos.y < top) {
 					if (!selectedUnits.Contains(unit)) {
 						addSelectedUnit(unit);
@@ -136,7 +138,7 @@ public class PlayerScript : MonoBehaviour {
 	
 	// Function to process a non-dragging selection click event
 	private void processSelectionClick() {
-		Ray lookRay = head.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+		Ray lookRay = camera.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 		if (Physics.Raycast(lookRay, out hit)) {
 
@@ -168,7 +170,7 @@ public class PlayerScript : MonoBehaviour {
 
 	// Function to issue a movement command to selected units
 	private void commandMovement() {
-		Ray lookRay = head.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+		Ray lookRay = camera.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 		if (Physics.Raycast(lookRay, out hit)) {
 
