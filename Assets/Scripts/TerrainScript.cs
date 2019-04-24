@@ -12,6 +12,7 @@ public class TerrainScript : MonoBehaviour {
 	public float scale = 1f;
 	public int length = 25, width = 25;
 	public int seed = 10;
+    public GameObject resourcePrefab;
 
 	void Start() {
 
@@ -19,7 +20,6 @@ public class TerrainScript : MonoBehaviour {
 		Vector3[] vertices = new Vector3[length * width];
 		Color[] colors = new Color[vertices.Length];
 		int[] triangles = new int[6 * (length-1) * (width-1)];
-		transform.position = new Vector3(-length/2f, 0f, -width/2f)*scale;
 
 		// Determine the basic vertices
 		for (int i = 0; i < length; i++) {
@@ -60,6 +60,17 @@ public class TerrainScript : MonoBehaviour {
 				}
 			}
 		}
+
+        int numHotSpots = Random.Range(1,100);
+        for(int i = 0; i < numHotSpots; i++)
+        {
+            int m = Random.Range(0, length);
+            int n = Random.Range(0, width);
+            GameObject newResource = Instantiate(resourcePrefab);
+            newResource.transform.position = vertices[getVertIndex(m, n)];
+
+
+        }
 
 		// Define the triangles
 		for (int i = 0; i < length - 1; i++) {

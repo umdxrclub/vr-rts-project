@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1536,6 +1536,8 @@ MonoBehaviour:
   length: 25
   width: 25
   seed: 10
+  resourcePrefab: {fileID: 2126655500524351383, guid: 133f1898abda00c45a590be5eb417fe5,
+    type: 3}
 --- !u!33 &899247722
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1817,7 +1819,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 999879931}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 12.5, y: 5, z: 12.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 629258181}
@@ -1863,6 +1865,7 @@ MonoBehaviour:
     type: 3}
   mouseModeText: {fileID: 0}
   camera: {fileID: 0}
+  money: 1000
 --- !u!1 &1010824639
 GameObject:
   m_ObjectHideFlags: 0
@@ -2407,6 +2410,7 @@ MonoBehaviour:
   owner: {fileID: 999879934}
   objectPrefabs:
   - {fileID: 7841579165011874868, guid: 11e5d9969677ca84085ae57244ff0292, type: 3}
+  prices: f4010000
   menuPrefab: {fileID: 5183409083851082419, guid: 2be4f624d42be154ba1a7f325c5f5d53,
     type: 3}
 --- !u!4 &1463757291
@@ -2417,7 +2421,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1463757289}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.16, z: 0}
+  m_LocalPosition: {x: 12.5, y: 0.16, z: 12.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1613963664}

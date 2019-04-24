@@ -10,6 +10,7 @@ public class Factory : MonoBehaviour {
 	public Transform canvas;
 	public PlayerScript owner;
 	public GameObject[] objectPrefabs;
+    public int[] prices;
 	public GameObject menuPrefab;
 
 	private float unitSpacing = 0.5f;
@@ -17,6 +18,14 @@ public class Factory : MonoBehaviour {
 	private GameObject placingFactory;
 
 	public void createObject(int index) {
+
+        if (prices[index]>owner.money)
+        {
+            return;
+        } else
+        {
+            owner.money -= prices[index];
+        }
 
 		if (objectPrefabs[index].GetComponent<Unit>() != null) {
 
@@ -38,7 +47,14 @@ public class Factory : MonoBehaviour {
 			GameObject newUnit = Instantiate(objectPrefabs[index], newPos, Quaternion.identity);
 			owner.addOwnedUnit(newUnit.GetComponent<Unit>());
 
-		} else if (objectPrefabs[index].GetComponent<Factory>() != null) {
+            if (objectPrefabs[index].GetComponent<Factory>() != null)
+            {
+                newUnit.GetComponent<Factory>().owner = this.owner;
+                newUnit.GetComponent<Factory>().canvas = this.canvas;
+                newUnit.GetComponent<Factory>().menuPrefab = this.menuPrefab;
+            }
+
+        } else if (objectPrefabs[index].GetComponent<Factory>() != null) {
 			
 			// Start placing the factory
 			placingFactory = Instantiate(objectPrefabs[index]);
@@ -60,7 +76,7 @@ public class Factory : MonoBehaviour {
 			}
 
 			// Let the factory go
-			if (menu == null || Input.GetMouseButtonDown(0)) {
+			if ((menu == null || Input.GetMouseButtonDown(0))&& Vector3.Distance(placingFactory.transform.position, transform.position) <= 3) {
 				placingFactory.GetComponent<Factory>().owner = this.owner;
 				placingFactory.GetComponent<Factory>().canvas = this.canvas;
 				foreach (Collider collider in placingFactory.GetComponentsInChildren(typeof(Collider))) {

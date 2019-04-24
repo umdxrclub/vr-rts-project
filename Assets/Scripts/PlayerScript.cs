@@ -13,6 +13,7 @@ public class PlayerScript : MonoBehaviour {
 	public GameObject dragSelectionPanelPrefab;
 	public UnityEngine.UI.Text mouseModeText;
 	public Camera camera;
+    public int money = 1000;
 
 	private Transform head;
 	private CharacterController cc;
@@ -27,7 +28,7 @@ public class PlayerScript : MonoBehaviour {
 	private bool dragSelecting;
 	private GameObject dragSelectionPanel;
 	private string[] mouseModeNames;
-
+    
 	void Start () {
 
 		lookSensitivity = 2f;
