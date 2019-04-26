@@ -9,6 +9,7 @@ public class TerrainScript : MonoBehaviour {
 
 	public Color mountainColor = new Color(82, 82, 82);
 	public Color plainsColor = new Color(9, 82, 12);
+	public Color resourceColor = new Color(219, 219, 36);
 	public float scale = 1f;
 	public int length = 25, width = 25;
 	public int seed = 10;
@@ -61,14 +62,16 @@ public class TerrainScript : MonoBehaviour {
 			}
 		}
 
-        int numHotSpots = Random.Range(1,100);
-        for(int i = 0; i < numHotSpots; i++)
-        {
+		// Generate resource locations
+        int numHotSpots = Random.Range(1,3);
+        for(int i = 0; i < numHotSpots; i++) {
+
             int m = Random.Range(0, length);
             int n = Random.Range(0, width);
             GameObject newResource = Instantiate(resourcePrefab);
             newResource.transform.position = vertices[getVertIndex(m, n)];
 
+			colors[getVertIndex(m, n)] = resourceColor;
 
         }
 

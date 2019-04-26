@@ -7,12 +7,10 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour {
 
-	public MeshRenderer selectionCircle;
-	public Material themeColor;
-
 	protected float speed;
 	protected float maxHealth;
 	
+	public GameObject selectionCircle;
 	protected CharacterController cc;
 	protected bool moving;
 	protected Vector3 targetPos;
@@ -30,6 +28,8 @@ public class Unit : MonoBehaviour {
     }
 
     void Update() {
+
+
         if (moving) {
 
 			// Perform the smooth movement and rotation
@@ -55,6 +55,7 @@ public class Unit : MonoBehaviour {
 	// Called on start by every unit
 	protected void setUpUnit() {
 		cc = GetComponent<CharacterController>();
+		selectionCircle = transform.Find("SelectionCircle").gameObject;
 		moving = false;
 		targetPos = Vector3.zero;
 		targetAngle = 0f;
@@ -72,7 +73,7 @@ public class Unit : MonoBehaviour {
 		}
 		GameObject lineObj = new GameObject();
 		lineObj.AddComponent<LineRenderer>();
-		lineObj.GetComponent<Renderer>().material = themeColor;
+		lineObj.GetComponent<Renderer>().material = selectionCircle.GetComponent<Renderer>().material;
 		line = lineObj.GetComponent<LineRenderer>();
 		line.generateLightingData = true;
 		line.startWidth = 0.01f;

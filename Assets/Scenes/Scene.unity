@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1532,11 +1532,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mountainColor: {r: 0.3207547, g: 0.3207547, b: 0.3207547, a: 0}
   plainsColor: {r: 0.035294123, g: 0.32156864, b: 0.046786454, a: 0}
+  resourceColor: {r: 330.12335, g: 330.12335, b: 54.266853, a: 1}
   scale: 1
   length: 25
   width: 25
   seed: 10
-  resourcePrefab: {fileID: 2126655500524351383, guid: 133f1898abda00c45a590be5eb417fe5,
+  resourcePrefab: {fileID: 1154069260676262312, guid: 374631051b3e938448086499946df6ce,
     type: 3}
 --- !u!33 &899247722
 MeshFilter:
@@ -1864,8 +1865,8 @@ MonoBehaviour:
   dragSelectionPanelPrefab: {fileID: 5764813181574538790, guid: ac111201df6edd54cbf8d49e958553d6,
     type: 3}
   mouseModeText: {fileID: 0}
-  camera: {fileID: 0}
-  money: 1000
+  cam: {fileID: 0}
+  money: 1000000
 --- !u!1 &1010824639
 GameObject:
   m_ObjectHideFlags: 0
@@ -2406,8 +2407,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72afead059f6aa34dbdf8caf3e51f721, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canvas: {fileID: 1745583462}
   owner: {fileID: 999879934}
+  canvas: {fileID: 1745583462}
   objectPrefabs:
   - {fileID: 7841579165011874868, guid: 11e5d9969677ca84085ae57244ff0292, type: 3}
   prices: f4010000

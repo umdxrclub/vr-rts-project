@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MineBuilderScript : Unit {
+public class MineBuilderUnit : Unit {
 	
 	void Start() {
 

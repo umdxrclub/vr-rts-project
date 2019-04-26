@@ -12,17 +12,15 @@ public class PlayerScript : MonoBehaviour {
 	public GameObject commandMarkPrefab;
 	public GameObject dragSelectionPanelPrefab;
 	public UnityEngine.UI.Text mouseModeText;
-	public Camera camera;
+	public Camera cam;
     public int money = 1000;
 
 	private Transform head;
 	private CharacterController cc;
-	private bool freeLooking;
 	private float walkSpeed;
 	private float jumpVelocity;
 	private List<Unit> ownedUnits;
 	private List<Unit> selectedUnits;
-	private int mouseMode;
 	private float mouseDownTime;
 	private Vector3 mouseDownPos;
 	private bool dragSelecting;
@@ -33,14 +31,12 @@ public class PlayerScript : MonoBehaviour {
 
 		lookSensitivity = 2f;
 		head = transform.Find("Head");
-		camera = head.GetComponent<Camera>();
+		cam = head.GetComponent<Camera>();
 		cc = GetComponent<CharacterController>();
-		freeLooking = false;
 		walkSpeed = 5f;
 		jumpVelocity = 0f;
 		ownedUnits = new List<Unit>();
 		selectedUnits = new List<Unit>();
-		mouseMode = 0;
 		mouseDownTime = 0f;
 		mouseDownPos = Vector3.zero;
 		dragSelecting = false;
@@ -77,7 +73,7 @@ public class PlayerScript : MonoBehaviour {
 			mouseDownPos = Input.mousePosition;
 		}
 
-		selectionModeUpdate();
+		selectionUpdate();
 	}
 
 	// Public function for adding a unit to the player's ownedUnits
@@ -85,8 +81,8 @@ public class PlayerScript : MonoBehaviour {
 		ownedUnits.Add(unit);
 	}
 
-	// Function to process the selection mode for each update it is active
-	private void selectionModeUpdate() {
+	// Function to process the selection for each update
+	private void selectionUpdate() {
 
 		// Process a non-dragging selection click
 		if (Input.GetMouseButtonUp(0) && !dragSelecting) {
@@ -116,7 +112,7 @@ public class PlayerScript : MonoBehaviour {
 					new Vector2(right - Screen.width, top - Screen.height);
 
 			foreach (Unit unit in ownedUnits) {
-				Vector3 screenPos = camera.WorldToScreenPoint(unit.transform.position);
+				Vector3 screenPos = cam.WorldToScreenPoint(unit.transform.position);
 				if (left < screenPos.x && screenPos.x < right && bottom < screenPos.y && screenPos.y < top) {
 					if (!selectedUnits.Contains(unit)) {
 						addSelectedUnit(unit);
@@ -139,7 +135,7 @@ public class PlayerScript : MonoBehaviour {
 	
 	// Function to process a non-dragging selection click event
 	private void processSelectionClick() {
-		Ray lookRay = camera.ScreenPointToRay(Input.mousePosition);
+		Ray lookRay = cam.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 		if (Physics.Raycast(lookRay, out hit)) {
 
@@ -147,7 +143,6 @@ public class PlayerScript : MonoBehaviour {
 			Factory hitFactory = getComponentInOrParent<Factory>(hit.transform);
 			if (hitFactory != null) {
 				hitFactory.openMenu();
-				return;
 			}
 
 			Unit hitUnit = getComponentInOrParent<Unit>(hit.transform);
@@ -171,7 +166,7 @@ public class PlayerScript : MonoBehaviour {
 
 	// Function to issue a movement command to selected units
 	private void commandMovement() {
-		Ray lookRay = camera.ScreenPointToRay(Input.mousePosition);
+		Ray lookRay = cam.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 		if (Physics.Raycast(lookRay, out hit)) {
 
@@ -189,20 +184,20 @@ public class PlayerScript : MonoBehaviour {
 
 	// Function to add to selected units
 	private void addSelectedUnit(Unit unit) {
-		unit.selectionCircle.enabled = true;
+		unit.selectionCircle.GetComponent<MeshRenderer>().enabled = true;
 		selectedUnits.Add(unit);
 	}
 
 	// Function to select a unit
 	private void removeSelectedUnit(Unit unit) {
-		unit.selectionCircle.enabled = false;
+		unit.selectionCircle.GetComponent<MeshRenderer>().enabled = false;
 		selectedUnits.Remove(unit);
 	}
 
 	// Function to clear selected units
 	private void clearSelectedUnits() {
 		foreach (Unit unit in selectedUnits) {
-			unit.selectionCircle.enabled = false;
+			unit.selectionCircle.GetComponent<MeshRenderer>().enabled = false;
 		}
 		selectedUnits.Clear();
 	}
