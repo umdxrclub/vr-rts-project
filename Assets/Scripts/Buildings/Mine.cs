@@ -5,13 +5,21 @@ using UnityEngine;
 // Author: XRClub RTS Team
 // Date: April 2019
 
-public class Mine : Building {
+public class Mine : Building
+{
 
-    void FixedUpdate() {
+    int moneyGain = 50;
+    float interval = 10f;
+
+    void Start() {
+        InvokeRepeating("addMoney", 0f, interval);
+    }
+
+    private void addMoney() {
 
 		if (owner != null) {
 			// Add money to the owner
-			owner.money++;
+			owner.money += moneyGain;
 		}
 		
 	}

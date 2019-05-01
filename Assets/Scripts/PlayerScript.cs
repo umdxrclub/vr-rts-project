@@ -9,13 +9,15 @@ public class PlayerScript : MonoBehaviour {
 
 	public float lookSensitivity;
 	public GameObject canvas;
-	public GameObject commandMarkPrefab;
+    public UnityEngine.UI.Text moneyText;
+    public GameObject commandMarkPrefab;
 	public GameObject dragSelectionPanelPrefab;
 	public UnityEngine.UI.Text mouseModeText;
 	public Camera cam;
     public int money = 1000;
+    public List<UnityEngine.XR.XRNodeState> controllers;
 
-	private Transform head;
+    private Transform head;
 	private CharacterController cc;
 	private float walkSpeed;
 	private float jumpVelocity;
@@ -41,7 +43,22 @@ public class PlayerScript : MonoBehaviour {
 		mouseDownPos = Vector3.zero;
 		dragSelecting = false;
 		dragSelectionPanel = null;
+
+	//    controllers = new List<UnityEngine.XR.XRNodeState>();
+	//    UnityEngine.XR.InputTracking.nodeAdded += controllerAdded;
 	}
+
+    void FixedUpdate()
+    {
+        /*foreach (UnityEngine.XR.XRNodeState node in controllers)
+        {
+            Vector3 temp;
+            node.TryGetPosition(out temp);
+            Debug.Log(node.tracked);
+       }*/
+
+        moneyText.text = "Money: " + money+"$";
+    }
 
 	void Update () {
 
@@ -86,7 +103,7 @@ public class PlayerScript : MonoBehaviour {
 
 		// Process a non-dragging selection click
 		if (Input.GetMouseButtonUp(0) && !dragSelecting) {
-			processSelectionClick();
+		    processSelectionClick(cam.ScreenPointToRay(Input.mousePosition));
 		}
 
 		// Start the drag selection
@@ -134,10 +151,9 @@ public class PlayerScript : MonoBehaviour {
 	}
 	
 	// Function to process a non-dragging selection click event
-	private void processSelectionClick() {
-		Ray lookRay = cam.ScreenPointToRay(Input.mousePosition);
+	private void processSelectionClick(Ray pointingRay) {
 		RaycastHit hit;
-		if (Physics.Raycast(lookRay, out hit)) {
+		if (Physics.Raycast(pointingRay, out hit)) {
 
 			// If it hits a factory, open the factory menu and return
 			Factory hitFactory = getComponentInOrParent<Factory>(hit.transform);
@@ -214,4 +230,10 @@ public class PlayerScript : MonoBehaviour {
 	private int safeMod(int m, int n) {
 		return (m + n) % n;
 	}
+    /*
+    private void controllerAdded(UnityEngine.XR.XRNodeState node)
+    {
+        Debug.Log(node.nodeType);
+        controllers.Add(node);
+    }*/
 }
