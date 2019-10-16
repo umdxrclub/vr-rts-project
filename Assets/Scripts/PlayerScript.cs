@@ -14,7 +14,7 @@ public class PlayerScript : MonoBehaviour {
 	public GameObject dragSelectionPanelPrefab;
 	public Camera cam;
     public int money = 1000;
-//  public List<UnityEngine.XR.XRNodeState> controllers;
+	public int income = 0;
 
     private Transform head;
 	private CharacterController cc;
@@ -43,22 +43,17 @@ public class PlayerScript : MonoBehaviour {
 		dragSelecting = false;
 		dragSelectionPanel = null;
 
-	//    controllers = new List<UnityEngine.XR.XRNodeState>();
-	//    UnityEngine.XR.InputTracking.nodeAdded += controllerAdded;
+        InvokeRepeating("addIncome", 0f, 1f);
 	}
 
-	void FixedUpdate() {
-		
-		/*foreach (UnityEngine.XR.XRNodeState node in controllers) {
-			Vector3 temp;
-			node.TryGetPosition(out temp);
-			Debug.Log(node.tracked);
-		}*/
-
-		moneyText.text = "Money: " + money+"$";
+	void addIncome() {
+		money += income;
 	}
 
 	void Update () {
+
+		// Update the money UI
+		moneyText.text = "Money: $" + money + " | Income: $" + income + "/s";
 
 		// Camera rotation
 		if (Input.GetMouseButton(1)) {
@@ -94,6 +89,12 @@ public class PlayerScript : MonoBehaviour {
 	// Public function for adding a unit to the player's ownedUnits
 	public void addOwnedUnit(Unit unit) {
 		ownedUnits.Add(unit);
+	}
+
+		// Public function for removing a unit from the player's ownedUnits
+	public void removeOwnedUnit(Unit unit) {
+		selectedUnits.Remove(unit);
+		ownedUnits.Remove(unit);
 	}
 
 	// Function to process the selection for each update
@@ -180,18 +181,22 @@ public class PlayerScript : MonoBehaviour {
 
 	// Function to issue a movement command to selected units
 	private void commandMovement() {
-		Ray lookRay = cam.ScreenPointToRay(Input.mousePosition);
-		RaycastHit hit;
-		if (Physics.Raycast(lookRay, out hit)) {
 
-			// Create a mark
-			GameObject newMark = Instantiate(commandMarkPrefab);
-			newMark.transform.position = hit.point;
-			newMark.GetComponent<CommandMarkScript>().decayTime = 0.1f;
+		// First make sure there are units selected
+		if (selectedUnits.Count > 0) {
+			Ray lookRay = cam.ScreenPointToRay(Input.mousePosition);
+			RaycastHit hit;
+			if (Physics.Raycast(lookRay, out hit)) {
 
-			// Tell each unit to move to the position
-			foreach (Unit unit in selectedUnits) {
-				unit.moveTo(hit.point);
+				// Create a mark
+				GameObject newMark = Instantiate(commandMarkPrefab);
+				newMark.transform.position = hit.point;
+				newMark.GetComponent<CommandMarkScript>().decayTime = 0.1f;
+
+				// Tell each unit to move to the position
+				foreach (Unit unit in selectedUnits) {
+					unit.moveTo(hit.point);
+				}
 			}
 		}
 	}
@@ -228,9 +233,4 @@ public class PlayerScript : MonoBehaviour {
 	private int safeMod(int m, int n) {
 		return (m + n) % n;
 	}
-
-	/*private void controllerAdded(UnityEngine.XR.XRNodeState node) {
-		Debug.Log(node.nodeType);
-		controllers.Add(node);
-	}*/
 }

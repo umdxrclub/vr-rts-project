@@ -715,6 +715,7 @@ MonoBehaviour:
   objectPrefabs:
   - {fileID: 6506234493658018987, guid: 96f91416f472b2d48a639d67e6d3a1c3, type: 3}
   prices: fa000000
+  destroyOnPurchase: 1
   menuPrefab: {fileID: 5183409083851082419, guid: 2be4f624d42be154ba1a7f325c5f5d53,
     type: 3}
 --- !u!1 &5513034435424165520

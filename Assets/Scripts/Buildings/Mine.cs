@@ -2,25 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Author: XRClub RTS Team
-// Date: April 2019
-
 public class Mine : Building
 {
 
-    int moneyGain = 50;
-    float interval = 10f;
+    int mineIncome = 5;
 
     void Start() {
-        InvokeRepeating("addMoney", 0f, interval);
+		if (owner != null) {
+			owner.income += mineIncome;
+		}
     }
 
-    private void addMoney() {
-
+	void OnDestroy() {
 		if (owner != null) {
-			// Add money to the owner
-			owner.money += moneyGain;
+			owner.income -= mineIncome;
 		}
-		
 	}
 }

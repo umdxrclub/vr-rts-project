@@ -68,11 +68,20 @@ public class TerrainScript : MonoBehaviour {
 
             int m = Random.Range(0, length);
             int n = Random.Range(0, width);
+
+			// Create the meaningful resource object
             GameObject newResource = Instantiate(resourcePrefab);
             newResource.transform.position = vertices[getVertIndex(m, n)];
 
-			colors[getVertIndex(m, n)] = resourceColor;
-
+			// Change the color of the nearby ground
+			int radius = 2;
+			for (int u = -radius; u <= radius; u++) {
+				for (int v = -radius; v <= radius; v++) {
+					if (Vector2.Distance(new Vector2(u, 0), new Vector2(0, v)) < radius) {
+						colors[getVertIndex(Mathf.Max(0, Mathf.Min(m+u, width)), Mathf.Max(0, Mathf.Min(n+v, length)))] = resourceColor;
+					}
+				}
+			}
         }
 
 		// Define the triangles

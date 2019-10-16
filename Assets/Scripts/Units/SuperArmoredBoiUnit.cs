@@ -8,7 +8,7 @@ public class SuperArmoredBoiUnit : Unit
     {
         // Override the default Unit stats
         speed = 0.4f;
-        maxHealth = 20;
+        maxHealth = 500;
 
         setUpUnit();
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ public class Unit : MonoBehaviour {
 	protected float speed;
 	protected float maxHealth;
 	
+	public PlayerScript owner;
 	public GameObject selectionCircle;
 	protected CharacterController cc;
 	protected bool moving;
@@ -22,9 +24,12 @@ public class Unit : MonoBehaviour {
 
 		// Default stats for units
 		speed = 1f;
-		maxHealth = 1;
+		maxHealth = 100f;
 
 		setUpUnit();
+
+		// Start the shooting cycle
+		InvokeRepeating("fireAtClosestEnemy", 0f, 1f);
     }
 
     void Update() {
@@ -60,6 +65,8 @@ public class Unit : MonoBehaviour {
 		targetPos = Vector3.zero;
 		targetAngle = 0f;
 		health = maxHealth;
+
+		//InvokeRepeating("fireAtClosestEnemy", 1, 1);
 	}
 
 	// Function called externally to tell the unit where to go
@@ -78,5 +85,32 @@ public class Unit : MonoBehaviour {
 		line.generateLightingData = true;
 		line.startWidth = 0.01f;
 		line.endWidth = 0.01f;
+	}
+
+	// Function to fire at the closest enemy if in range
+	public void fireAtClosestEnemy() {
+		
+		Unit[] enemies = (Unit[])GameObject.FindObjectsOfType(typeof(Unit));
+		
+		if (enemies.Length > 0) {
+			Unit nearestEnemy = enemies[0];
+			float bestDistSqr = (transform.position - enemies[0].transform.position).sqrMagnitude;
+
+			// Find the nearest enemy
+			foreach (Unit enemy in enemies) {
+				float thisDistSqr = (transform.position - enemy.transform.position).sqrMagnitude;
+				if (thisDistSqr < bestDistSqr) {
+					nearestEnemy = enemy;
+					bestDistSqr = thisDistSqr;
+				}
+			}
+
+			// Fire at the enemy
+			nearestEnemy.health -= 10f;
+		}
+	}
+
+	void OnDestroy() {
+		owner.removeOwnedUnit(this);
 	}
 }

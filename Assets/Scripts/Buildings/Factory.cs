@@ -32,7 +32,7 @@ public class Factory : Building {
 				isSafePos = true;
 				Collider[] nearbyObjects = Physics.OverlapSphere(newPos, unitSpacing);
 				foreach (Collider coll in nearbyObjects) {
-					if (getComponentInOrParent<Factory>(coll.transform)!= null || getComponentInOrParent<Unit>(coll.transform)!= null) {
+					if (getComponentInOrParent<Factory>(coll.transform) != null || getComponentInOrParent<Unit>(coll.transform) != null) {
 						isSafePos = false;
 					}
 				}
@@ -41,7 +41,9 @@ public class Factory : Building {
 			// Instantiate a new Unit at the safe spawn location
 			GameObject newUnit = Instantiate(objectPrefabs[index], newPos, Quaternion.identity);
 			newUnit.name = objectPrefabs[index].name;
+			newUnit.GetComponent<Unit>().owner = this.owner;
 			owner.addOwnedUnit(newUnit.GetComponent<Unit>());
+			
 
 			// If the new unit is also a factory, provide references to things
             if (objectPrefabs[index].GetComponent<Factory>() != null) {
@@ -63,6 +65,10 @@ public class Factory : Building {
 					newMine.GetComponent<Building>().canvas = this.canvas;
 					Destroy(collider.gameObject);
 
+					// Also destroy the miner (this object)
+					closeMenu();
+					Destroy(gameObject);
+
 					return;
 				}
 			}
@@ -81,6 +87,11 @@ public class Factory : Building {
 	}
 
 	void Update() {
+
+		// If C is pressed, close the menu
+		if (Input.GetKeyDown(KeyCode.C)) {
+			closeMenu();
+		}
 
 		if (placingBuilding != null) {
 
