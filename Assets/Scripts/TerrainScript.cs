@@ -11,9 +11,13 @@ public class TerrainScript : MonoBehaviour {
 	public Color plainsColor = new Color(9, 82, 12);
 	public Color resourceColor = new Color(219, 219, 36);
 	public float scale = 1f;
+	public int minMountains = 1;
+	public int maxMountains = 3;
+	public int minResources = 1;
+	public int maxResources = 3;
 	public int length = 25, width = 25;
 	public int seed = 10;
-    public GameObject resourcePrefab;
+    public GameObject resourcePrefab, mountainPrefab;
 
 	void Start() {
 
@@ -35,12 +39,13 @@ public class TerrainScript : MonoBehaviour {
 		}
 
 		// Generate mountains
-		int numMountains = Random.Range(0,4);
+		int numMountains = Random.Range(minMountains, maxMountains + 1);
 		for (int k = 0; k < numMountains; k++) {
 			int i = Random.Range(0, length);
 			int j = Random.Range(0, width);
 			int radius = Random.Range(3, 10);
 			int height = Random.Range(1, 5);
+
 			for (int m = -radius; m <= radius; m++) {
 				for (int n = -radius; n <= radius; n++) {
 
@@ -60,17 +65,24 @@ public class TerrainScript : MonoBehaviour {
 					}
 				}
 			}
+
+			// Create a mountain object in the heirarchy
+            GameObject newMountain = Instantiate(mountainPrefab);
+			newMountain.GetComponent<MountainScript>().terrain = gameObject;
+			newMountain.transform.SetParent(transform);
+            newMountain.transform.position = vertices[getVertIndex(i, j)];
 		}
 
 		// Generate resource locations
-        int numHotSpots = Random.Range(1,3);
+        int numHotSpots = Random.Range(minResources, maxResources + 1);
         for(int i = 0; i < numHotSpots; i++) {
 
             int m = Random.Range(0, length);
             int n = Random.Range(0, width);
 
-			// Create the meaningful resource object
+			// Create the actual resource object
             GameObject newResource = Instantiate(resourcePrefab);
+			newResource.transform.SetParent(transform);
             newResource.transform.position = vertices[getVertIndex(m, n)];
 
 			// Change the color of the nearby ground
@@ -107,6 +119,21 @@ public class TerrainScript : MonoBehaviour {
 		mesh.RecalculateNormals();
 		gameObject.GetComponent<MeshFilter>().mesh = mesh;
 		gameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
+
+		// Move everything so that the origin is in the middle
+		gameObject.transform.Translate(-scale * length / 2f, 0f, -scale * width / 2f);
+
+	}
+
+	// Get the height of the terrain at an x and z in world space
+	public float heightMap(float worldX, float worldZ) {
+
+		float i = (worldX / scale) + length / 2f;
+		float j = (worldZ / scale) + width / 2f;
+
+		Mesh mesh = gameObject.GetComponent<MeshFilter>().mesh;
+
+		return mesh.vertices[getVertIndex((int)Mathf.Round(i), (int)Mathf.Round(j))].y;	
 	}
 
 	// Helper function to get the vertices index from i, j

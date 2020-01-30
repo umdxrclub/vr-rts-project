@@ -151,8 +151,9 @@ public class PlayerScript : MonoBehaviour {
 	
 	// Function to process a non-dragging selection click event
 	private void processSelectionClick(Ray pointingRay) {
+
 		RaycastHit hit;
-		if (Physics.Raycast(pointingRay, out hit)) {
+		if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() && Physics.Raycast(pointingRay, out hit)) {
 
 			// If it hits a factory, open the factory menu and return
 			Factory hitFactory = getComponentInOrParent<Factory>(hit.transform);

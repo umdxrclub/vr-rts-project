@@ -8,35 +8,30 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour {
 
-	protected float speed;
-	protected float maxHealth;
+	protected float speed = 1f;
+	protected float maxHealth = 100f;
+	protected float damage = 10f;
+	protected float fireInterval = 1f;
 	
 	public PlayerScript owner;
 	public GameObject selectionCircle;
+	public GameObject[] coloredParts;
+	public Material red, blue;
 	protected CharacterController cc;
-	protected bool moving;
-	protected Vector3 targetPos;
-	protected float targetAngle;
+	protected bool moving = false;
+	protected Vector3 targetPos = Vector3.zero;
+	protected float targetAngle = 0f;
 	protected LineRenderer line;
 	protected float health;
 	
     void Start() {
-
-		// Default stats for units
-		speed = 1f;
-		maxHealth = 100f;
-
 		setUpUnit();
-
-		// Start the shooting cycle
-		InvokeRepeating("fireAtClosestEnemy", 0f, 1f);
     }
 
     void Update() {
-
-
+		
         if (moving) {
-
+			
 			// Perform the smooth movement and rotation
 			Vector2 movementVector = new Vector2(targetPos.x - transform.position.x, targetPos.z - transform.position.z);
 			cc.Move((Vector3.ClampMagnitude(new Vector3(movementVector.x, 0, movementVector.y), 1) + Vector3.down)
@@ -61,12 +56,21 @@ public class Unit : MonoBehaviour {
 	protected void setUpUnit() {
 		cc = GetComponent<CharacterController>();
 		selectionCircle = transform.Find("SelectionCircle").gameObject;
-		moving = false;
-		targetPos = Vector3.zero;
-		targetAngle = 0f;
 		health = maxHealth;
 
-		//InvokeRepeating("fireAtClosestEnemy", 1, 1);
+		// Set the colored parts to the owner's color
+		Material newColor = (owner == null ? red : blue);
+		selectionCircle.GetComponent<Renderer>().material = newColor;
+		if (line != null) {
+			line.GetComponent<Renderer>().material = newColor;
+		}
+		foreach(GameObject coloredPart in coloredParts) {
+			coloredPart.GetComponent<Renderer>().material = newColor;
+		}
+
+		if (damage > 0) {
+			InvokeRepeating("fireAtClosestEnemy", 1, 1);
+		}
 	}
 
 	// Function called externally to tell the unit where to go
@@ -111,6 +115,9 @@ public class Unit : MonoBehaviour {
 	}
 
 	void OnDestroy() {
-		owner.removeOwnedUnit(this);
+		if (owner != null) {
+			owner.removeOwnedUnit(this);
+		}
+		Destroy(line);
 	}
 }

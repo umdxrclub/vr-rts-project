@@ -74,7 +74,7 @@ public class Factory : Building {
 			}
 
 		// Otherwise a normal Building is being placed down
-        } else if (objectPrefabs[index].GetComponent<Building>() != null) {
+        } else if (objectPrefabs[index].GetComponent<Building>() != null && placingBuilding == null) {
 			
 			// Start placing the building
 			placingBuilding = Instantiate(objectPrefabs[index]);
@@ -104,8 +104,9 @@ public class Factory : Building {
 			}
 
 			// Check to see if it should be placed down
-			if (Input.GetMouseButtonDown(0) && owner.money >= placingPrice) {
-				
+			if (Input.GetMouseButtonDown(0) && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()
+					&& owner.money >= placingPrice) {
+
 				// Make sure there are not any buildings or units too close
 				bool isSafePos = true;
 				Collider[] nearbyObjects = Physics.OverlapSphere(placingBuilding.transform.position, buildingSpacing);
