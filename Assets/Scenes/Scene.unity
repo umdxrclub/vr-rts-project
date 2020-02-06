@@ -1597,9 +1597,9 @@ MonoBehaviour:
   maxMountains: 4
   minResources: 3
   maxResources: 6
-  length: 50
-  width: 50
-  seed: 10
+  length: 100
+  width: 100
+  seed: 9
   resourcePrefab: {fileID: 1154069260676262312, guid: 374631051b3e938448086499946df6ce,
     type: 3}
   mountainPrefab: {fileID: 7520806079879059679, guid: 588157566047a1248990ec0448311c82,
@@ -1891,7 +1891,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 999879931}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 0, y: 9.29, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 629258181}

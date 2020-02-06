@@ -41,8 +41,10 @@ public class TerrainScript : MonoBehaviour {
 		// Generate mountains
 		int numMountains = Random.Range(minMountains, maxMountains + 1);
 		for (int k = 0; k < numMountains; k++) {
-			int i = Random.Range(0, length);
-			int j = Random.Range(0, width);
+			float angle = Random.value * 2f * Mathf.PI;
+			float magnitude = (0.5f + Random.value/2f) * (Mathf.Min(length, width) / 2f);
+			int i = Mathf.Clamp((int)Mathf.Round(magnitude * Mathf.Cos(angle) + length/2), 0, length - 1);
+			int j =Mathf.Clamp((int)Mathf.Round(magnitude * Mathf.Sin(angle) + width/2), 0, width - 1);
 			int radius = Random.Range(3, 10);
 			int height = Random.Range(1, 5);
 
@@ -77,8 +79,10 @@ public class TerrainScript : MonoBehaviour {
         int numHotSpots = Random.Range(minResources, maxResources + 1);
         for(int i = 0; i < numHotSpots; i++) {
 
-            int m = Random.Range(0, length);
-            int n = Random.Range(0, width);
+			float angle = Random.value * 2f * Mathf.PI;
+			float magnitude = (0.2f + Random.value/2f) * (Mathf.Min(length, width) / 2f);
+			int m = Mathf.Clamp((int)Mathf.Round(magnitude * Mathf.Cos(angle) + length/2), 0, length - 1);
+			int n = Mathf.Clamp((int)Mathf.Round(magnitude * Mathf.Sin(angle) + width/2), 0, width - 1);
 
 			// Create the actual resource object
             GameObject newResource = Instantiate(resourcePrefab);
@@ -89,8 +93,8 @@ public class TerrainScript : MonoBehaviour {
 			int radius = 2;
 			for (int u = -radius; u <= radius; u++) {
 				for (int v = -radius; v <= radius; v++) {
-					if (Vector2.Distance(new Vector2(u, 0), new Vector2(0, v)) < radius) {
-						colors[getVertIndex(Mathf.Max(0, Mathf.Min(m+u, width)), Mathf.Max(0, Mathf.Min(n+v, length)))] = resourceColor;
+					if (isInBounds(m+u, n+v) && Vector2.Distance(new Vector2(u, 0), new Vector2(0, v)) < radius) {
+						colors[getVertIndex(m+u, n+v)] = resourceColor;
 					}
 				}
 			}
@@ -134,6 +138,11 @@ public class TerrainScript : MonoBehaviour {
 		Mesh mesh = gameObject.GetComponent<MeshFilter>().mesh;
 
 		return mesh.vertices[getVertIndex((int)Mathf.Round(i), (int)Mathf.Round(j))].y;	
+	}
+
+	// Helper function to get if coordinates are in bounds
+	private bool isInBounds(int i, int j) {
+		return (0 <= i && i < length && 0 <= j && j < width);
 	}
 
 	// Helper function to get the vertices index from i, j
