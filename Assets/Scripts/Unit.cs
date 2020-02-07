@@ -8,10 +8,10 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour {
 
-	protected float speed = 1f;
-	protected float maxHealth = 100f;
-	protected float damage = 10f;
-	protected float fireInterval = 1f;
+	public float speed = 1f;
+	public float maxHealth = 100f;
+	public float damage = 10f;
+	public float fireInterval = 1f;
 	
 	public PlayerScript owner;
 	public GameObject selectionCircle;
@@ -25,7 +25,29 @@ public class Unit : MonoBehaviour {
 	protected float health;
 	
     void Start() {
-		setUpUnit();
+
+		cc = GetComponent<CharacterController>();
+
+		// Create the selection circle
+		selectionCircle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+		selectionCircle.transform.SetParent(transform);
+		selectionCircle.transform.localPosition = Vector3.zero;
+		selectionCircle.transform.localScale = new Vector3(2.5f * cc.radius, 0.1f, 2.5f * cc.radius);
+		Destroy(selectionCircle.GetComponent<CapsuleCollider>());
+		selectionCircle.GetComponent<MeshRenderer>().enabled = false;
+		// Set health to max
+		health = maxHealth;
+
+		// Set the colored parts to the owner's color
+		Material newColor = (owner == null ? red : blue);
+		selectionCircle.GetComponent<Renderer>().material = newColor;
+		foreach(GameObject coloredPart in coloredParts) {
+			coloredPart.GetComponent<Renderer>().material = newColor;
+		}
+
+		if (damage > 0) {
+			InvokeRepeating("fireAtClosestEnemy", 1, 1);
+		}
     }
 
     void Update() {
@@ -52,31 +74,9 @@ public class Unit : MonoBehaviour {
 		}
     }
 
-	// Called on start by every unit
-	protected void setUpUnit() {
-		cc = GetComponent<CharacterController>();
-		selectionCircle = transform.Find("SelectionCircle").gameObject;
-		health = maxHealth;
-
-		// Set the colored parts to the owner's color
-		Material newColor = (owner == null ? red : blue);
-		selectionCircle.GetComponent<Renderer>().material = newColor;
-		if (line != null) {
-			line.GetComponent<Renderer>().material = newColor;
-		}
-		foreach(GameObject coloredPart in coloredParts) {
-			coloredPart.GetComponent<Renderer>().material = newColor;
-		}
-
-		if (damage > 0) {
-			InvokeRepeating("fireAtClosestEnemy", 1, 1);
-		}
-	}
-
 	// Function called externally to tell the unit where to go
 	public void moveTo(Vector3 position) {
 
-		moving = true;
 		targetPos = position;
 		targetAngle = Mathf.Rad2Deg*Mathf.Atan2(targetPos.x-transform.position.x, targetPos.z-transform.position.z);
 		if (line != null && line.gameObject != null) {
@@ -89,6 +89,7 @@ public class Unit : MonoBehaviour {
 		line.generateLightingData = true;
 		line.startWidth = 0.01f;
 		line.endWidth = 0.01f;
+		moving = true;
 	}
 
 	// Function to fire at the closest enemy if in range

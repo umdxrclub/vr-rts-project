@@ -10,7 +10,7 @@ public class MountainScript : MonoBehaviour
     void Start()
     {
         // Start spawning mountain men
-        InvokeRepeating("spawnMountainMan", 0, 5);
+        InvokeRepeating("spawnMountainMan", 5, 5);
     }
 
     // Update is called once per frame
@@ -19,11 +19,16 @@ public class MountainScript : MonoBehaviour
         
     }
 
-    void spawnMountainMan() {
+    private void spawnMountainMan() {
         GameObject newMountainMan = Instantiate(mountainManPrefab, transform.position + Vector3.up * 0.1f, Quaternion.identity);
-        newMountainMan.name = "Mountain Man";
         newMountainMan.GetComponent<Unit>().owner = null;
+        newMountainMan.name = "Mountain Man";
 
+        StartCoroutine(doMoveTo(newMountainMan));
+    }
+
+    private IEnumerator doMoveTo(GameObject newMountainMan) {
+        yield return new WaitForSeconds(1);
         float angle = Random.value * 2f * Mathf.PI;
         float x = Mathf.Sin(angle), z = Mathf.Cos(angle);
         Vector3 targetPos = new Vector3(x, terrain.GetComponent<TerrainScript>().heightMap(x, z), z);
