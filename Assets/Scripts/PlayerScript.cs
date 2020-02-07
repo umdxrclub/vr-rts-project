@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Author: Paul Armstrong, XRClub
-// Date: March 2019
 
 public class PlayerScript : MonoBehaviour {
 

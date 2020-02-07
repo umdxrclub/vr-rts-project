@@ -3,26 +3,25 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Author: Paul Armstrong, XRClub
-// Date: March 2019
-
-public class Unit : MonoBehaviour {
+public class Unit : Damageable {
 
 	public float speed = 1f;
-	public float maxHealth = 100f;
 	public float damage = 10f;
 	public float fireInterval = 1f;
-	
-	public PlayerScript owner;
-	public GameObject selectionCircle;
+
 	public GameObject[] coloredParts;
 	public Material red, blue;
+
+	[HideInInspector]
+	public bool onAuto = false;
+	[HideInInspector]
+	public GameObject selectionCircle;
+
 	protected CharacterController cc;
 	protected bool moving = false;
 	protected Vector3 targetPos = Vector3.zero;
 	protected float targetAngle = 0f;
 	protected LineRenderer line;
-	protected float health;
 	
     void Start() {
 
@@ -35,6 +34,7 @@ public class Unit : MonoBehaviour {
 		selectionCircle.transform.localScale = new Vector3(2.5f * cc.radius, 0.1f, 2.5f * cc.radius);
 		Destroy(selectionCircle.GetComponent<CapsuleCollider>());
 		selectionCircle.GetComponent<MeshRenderer>().enabled = false;
+
 		// Set health to max
 		health = maxHealth;
 
@@ -46,12 +46,37 @@ public class Unit : MonoBehaviour {
 		}
 
 		if (damage > 0) {
-			InvokeRepeating("fireAtClosestEnemy", 1, 1);
+			InvokeRepeating("fireAtClosestEnemyInRange", 1, fireInterval);
 		}
     }
 
+	void FixedUpdate() {
+
+		if (onAuto) {
+
+			// Find the closest enemy
+			Damageable[] allDamageables = (Damageable[])FindObjectsOfType(typeof(Damageable));
+			Damageable closestEnemy = null;
+			float closestDistance = 0;
+			foreach (Damageable damageable in allDamageables) {
+				if (damageable.owner != owner) {
+					float distance = Vector3.SqrMagnitude(damageable.transform.position - transform.position);
+					if (closestEnemy == null || distance < closestDistance) {
+						closestEnemy = damageable;
+						closestDistance = distance;
+					}
+				}
+			}
+
+			// Move to the closest enemy
+			if (closestEnemy != null) {
+				moveTo(closestEnemy.transform.position);
+			}
+		}
+	}
+
     void Update() {
-		
+
         if (moving) {
 			
 			// Perform the smooth movement and rotation
@@ -69,6 +94,7 @@ public class Unit : MonoBehaviour {
 				moving = false;
 				Destroy(line.gameObject);
 			}
+				
 		} else if (!cc.isGrounded) {
 			cc.Move(Vector3.down * speed *  Time.deltaTime);
 		}
@@ -93,7 +119,7 @@ public class Unit : MonoBehaviour {
 	}
 
 	// Function to fire at the closest enemy if in range
-	public void fireAtClosestEnemy() {
+	public void fireAtClosestEnemyInRange() {
 		
 		Unit[] enemies = (Unit[])GameObject.FindObjectsOfType(typeof(Unit));
 		

@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 // Author: Paul Armstrong, XRClub
-// Date: March 2019
 
 public class TerrainScript : MonoBehaviour {
 
@@ -18,6 +18,12 @@ public class TerrainScript : MonoBehaviour {
 	public int length = 25, width = 25;
 	public int seed = 10;
     public GameObject resourcePrefab, mountainPrefab;
+	public UnityEvent onComplete;
+
+	[HideInInspector]
+	public GameObject[] mountains;
+	[HideInInspector]
+	public GameObject[] resources;
 
 	void Start() {
 
@@ -40,11 +46,12 @@ public class TerrainScript : MonoBehaviour {
 
 		// Generate mountains
 		int numMountains = Random.Range(minMountains, maxMountains + 1);
+		mountains = new GameObject[numMountains];
 		for (int k = 0; k < numMountains; k++) {
 			float angle = Random.value * 2f * Mathf.PI;
 			float magnitude = (0.5f + Random.value/2f) * (Mathf.Min(length, width) / 2f);
 			int i = Mathf.Clamp((int)Mathf.Round(magnitude * Mathf.Cos(angle) + length/2), 0, length - 1);
-			int j =Mathf.Clamp((int)Mathf.Round(magnitude * Mathf.Sin(angle) + width/2), 0, width - 1);
+			int j = Mathf.Clamp((int)Mathf.Round(magnitude * Mathf.Sin(angle) + width/2), 0, width - 1);
 			int radius = Random.Range(3, 10);
 			int height = Random.Range(1, 5);
 
@@ -70,14 +77,15 @@ public class TerrainScript : MonoBehaviour {
 
 			// Create a mountain object in the heirarchy
             GameObject newMountain = Instantiate(mountainPrefab);
-			newMountain.GetComponent<MountainScript>().terrain = gameObject;
 			newMountain.transform.SetParent(transform);
             newMountain.transform.position = vertices[getVertIndex(i, j)];
+			mountains[k] = newMountain;
 		}
 
 		// Generate resource locations
-        int numHotSpots = Random.Range(minResources, maxResources + 1);
-        for(int i = 0; i < numHotSpots; i++) {
+        int numResources = Random.Range(minResources, maxResources + 1);
+		resources = new GameObject[numResources];
+        for(int i = 0; i < numResources; i++) {
 
 			float angle = Random.value * 2f * Mathf.PI;
 			float magnitude = (0.2f + Random.value/2f) * (Mathf.Min(length, width) / 2f);
@@ -88,6 +96,7 @@ public class TerrainScript : MonoBehaviour {
             GameObject newResource = Instantiate(resourcePrefab);
 			newResource.transform.SetParent(transform);
             newResource.transform.position = vertices[getVertIndex(m, n)];
+			resources[i] = newResource;
 
 			// Change the color of the nearby ground
 			int radius = 2;
@@ -126,6 +135,9 @@ public class TerrainScript : MonoBehaviour {
 
 		// Move everything so that the origin is in the middle
 		gameObject.transform.Translate(-scale * length / 2f, 0f, -scale * width / 2f);
+
+		// Call the onComplete function
+		onComplete.Invoke();
 
 	}
 

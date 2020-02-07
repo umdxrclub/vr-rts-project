@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Author: XRClub RTS Team
-// Date: April 2019
 
 // Interface useful for grouping Factories and Mines together
-public class Building : MonoBehaviour {
+public class Building : Damageable {
 
-	public PlayerScript owner;
 	public Transform canvas;
-
 }
