@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Author: Paul Armstrong, XRClub
-// Date: April 2019
-
 public class Factory : Building {
 
 	public GameObject[] objectPrefabs;
@@ -19,11 +16,15 @@ public class Factory : Building {
 	private int placingPrice;
 
 	public void createObject(int index) {
+
+		if (gameObject == null) {
+			return;
+		}
 		
 		if (objectPrefabs[index].GetComponent<Unit>() != null && owner.money >= prices[index]) {
 
 			owner.money -= prices[index];
-			Vector3 newPos = transform.position + Vector3.forward;
+			Vector3 newPos = transform.position + 0.2f * Vector3.up + Vector3.forward;
 			bool isSafePos = false;
 
 			// Keep moving the position until there is a safe position

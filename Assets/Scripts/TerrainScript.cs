@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-// Author: Paul Armstrong, XRClub
-
 public class TerrainScript : MonoBehaviour {
 
 	public Color mountainColor = new Color(82, 82, 82);
@@ -25,7 +23,11 @@ public class TerrainScript : MonoBehaviour {
 	[HideInInspector]
 	public GameObject[] resources;
 
+	public static TerrainScript instance;
+
 	void Start() {
+
+		instance = this;
 
 		Random.InitState(seed);
 		Vector3[] vertices = new Vector3[length * width];
@@ -144,12 +146,22 @@ public class TerrainScript : MonoBehaviour {
 	// Get the height of the terrain at an x and z in world space
 	public float heightMap(float worldX, float worldZ) {
 
-		float i = (worldX / scale) + length / 2f;
-		float j = (worldZ / scale) + width / 2f;
+		float i = Mathf.Clamp((worldX / scale) + length / 2f, 0, length-1);
+		float j = Mathf.Clamp((worldZ / scale) + width / 2f, 0, width-1);
 
 		Mesh mesh = gameObject.GetComponent<MeshFilter>().mesh;
 
-		return mesh.vertices[getVertIndex((int)Mathf.Round(i), (int)Mathf.Round(j))].y;	
+		float[] corners = {
+			mesh.vertices[getVertIndex((int)Mathf.Floor(i), (int)Mathf.Floor(j))].y,
+			mesh.vertices[getVertIndex((int)Mathf.Floor(i), (int)Mathf.Ceil(j))].y,
+			mesh.vertices[getVertIndex((int)Mathf.Ceil(i), (int)Mathf.Floor(j))].y,
+			mesh.vertices[getVertIndex((int)Mathf.Ceil(i), (int)Mathf.Ceil(j))].y,
+		};
+
+		float lowerJLerp = Mathf.Lerp(corners[0], corners[1], j - Mathf.Floor(j));
+		float upperJLerp = Mathf.Lerp(corners[2], corners[3], j - Mathf.Floor(j));
+
+		return Mathf.Lerp(lowerJLerp, upperJLerp, i - Mathf.Floor(i));
 	}
 
 	// Helper function to get if coordinates are in bounds

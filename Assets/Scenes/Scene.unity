@@ -1907,7 +1907,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 999879931}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 9.29, z: 0}
+  m_LocalPosition: {x: 0, y: 4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 629258181}
@@ -2549,7 +2549,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   owner: {fileID: 999879934}
-  maxHealth: 0
+  maxHealth: 2500
+  health: 0
   canvas: {fileID: 1745583462}
   objectPrefabs:
   - {fileID: 7841579165011874868, guid: 11e5d9969677ca84085ae57244ff0292, type: 3}

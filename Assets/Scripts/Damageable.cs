@@ -10,5 +10,21 @@ public class Damageable : MonoBehaviour
     public PlayerScript owner;
     
     public float maxHealth;
-    protected float health;
+    public float health;
+
+    void Start() {
+
+        // Set health to max
+		health = maxHealth;
+    }
+
+    // Function to deal damage to this Damageable
+	public void doDamage(float dmg) {
+        health -= dmg;
+        if (health <= 0) {
+
+            // TODO make the object explode or something
+            Destroy(gameObject);
+        }
+	}
 }

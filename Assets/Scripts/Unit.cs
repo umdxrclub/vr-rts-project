@@ -2,12 +2,14 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Unit : Damageable {
 
 	public float speed = 1f;
 	public float damage = 10f;
 	public float fireInterval = 1f;
+	public float range = 1f;
 
 	public GameObject[] coloredParts;
 	public Material red, blue;
@@ -17,7 +19,10 @@ public class Unit : Damageable {
 	[HideInInspector]
 	public GameObject selectionCircle;
 
+	// if moving is true, targetPos must exist, targetObject might be null
 	protected CharacterController cc;
+	protected Damageable closestEnemy = null;
+	protected GameObject targetObject = null;
 	protected bool moving = false;
 	protected Vector3 targetPos = Vector3.zero;
 	protected float targetAngle = 0f;
@@ -30,13 +35,11 @@ public class Unit : Damageable {
 		// Create the selection circle
 		selectionCircle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
 		selectionCircle.transform.SetParent(transform);
-		selectionCircle.transform.localPosition = Vector3.zero;
+		selectionCircle.transform.position = new Vector3(transform.position.x,
+				TerrainScript.instance.heightMap(transform.position.x, transform.position.z) + 0.05f, transform.position.z);
 		selectionCircle.transform.localScale = new Vector3(2.5f * cc.radius, 0.1f, 2.5f * cc.radius);
 		Destroy(selectionCircle.GetComponent<CapsuleCollider>());
 		selectionCircle.GetComponent<MeshRenderer>().enabled = false;
-
-		// Set health to max
-		health = maxHealth;
 
 		// Set the colored parts to the owner's color
 		Material newColor = (owner == null ? red : blue);
@@ -46,38 +49,19 @@ public class Unit : Damageable {
 		}
 
 		if (damage > 0) {
-			InvokeRepeating("fireAtClosestEnemyInRange", 1, fireInterval);
+			InvokeRepeating("fireAtClosestEnemyInRange", Random.value * 0.2f, fireInterval);
 		}
+
+		// Start watching for closest enemy for when onAuto is true
+		InvokeRepeating("updateEnemySearch", Random.value * 0.2f, 1);
     }
-
-	void FixedUpdate() {
-
-		if (onAuto) {
-
-			// Find the closest enemy
-			Damageable[] allDamageables = (Damageable[])FindObjectsOfType(typeof(Damageable));
-			Damageable closestEnemy = null;
-			float closestDistance = 0;
-			foreach (Damageable damageable in allDamageables) {
-				if (damageable.owner != owner) {
-					float distance = Vector3.SqrMagnitude(damageable.transform.position - transform.position);
-					if (closestEnemy == null || distance < closestDistance) {
-						closestEnemy = damageable;
-						closestDistance = distance;
-					}
-				}
-			}
-
-			// Move to the closest enemy
-			if (closestEnemy != null) {
-				moveTo(closestEnemy.transform.position);
-			}
-		}
-	}
 
     void Update() {
 
         if (moving) {
+			if (targetObject != null) {
+				targetPos = targetObject.transform.position;
+			}
 			
 			// Perform the smooth movement and rotation
 			Vector2 movementVector = new Vector2(targetPos.x - transform.position.x, targetPos.z - transform.position.z);
@@ -86,8 +70,14 @@ public class Unit : Damageable {
 			transform.localEulerAngles =
 					new Vector3(0, Mathf.LerpAngle(transform.localEulerAngles.y, targetAngle, Mathf.Min(10*Time.deltaTime, 0.2f)), 0);
 
-			// Maintain the path line
-			line.SetPositions(new Vector3[] { transform.position + 0.05f*Vector3.up , targetPos + 0.05f*Vector3.up });
+			if (owner != null) {
+				// Maintain the selection circle's position
+				selectionCircle.transform.position = new Vector3(transform.position.x,
+						TerrainScript.instance.heightMap(transform.position.x, transform.position.z) + 0.05f, transform.position.z);
+
+				// Maintain the path line
+				line.SetPositions(new Vector3[] { selectionCircle.transform.position + 0.05f*Vector3.up , targetPos + 0.05f*Vector3.up });
+			}
 
 			// If close enough, end the movement
 			if (movementVector.SqrMagnitude() < 0.2f) {
@@ -108,36 +98,72 @@ public class Unit : Damageable {
 		if (line != null && line.gameObject != null) {
 			Destroy(line.gameObject);
 		}
+
 		GameObject lineObj = new GameObject();
 		lineObj.AddComponent<LineRenderer>();
 		lineObj.GetComponent<Renderer>().material = selectionCircle.GetComponent<Renderer>().material;
+		lineObj.GetComponent<Renderer>().enabled = owner != null;
 		line = lineObj.GetComponent<LineRenderer>();
 		line.generateLightingData = true;
 		line.startWidth = 0.01f;
 		line.endWidth = 0.01f;
+
 		moving = true;
 	}
 
-	// Function to fire at the closest enemy if in range
-	public void fireAtClosestEnemyInRange() {
-		
-		Unit[] enemies = (Unit[])GameObject.FindObjectsOfType(typeof(Unit));
-		
-		if (enemies.Length > 0) {
-			Unit nearestEnemy = enemies[0];
-			float bestDistSqr = (transform.position - enemies[0].transform.position).sqrMagnitude;
+	// Function to tell the unit to go to a GameObject
+	public void moveTo(GameObject target) {
 
-			// Find the nearest enemy
-			foreach (Unit enemy in enemies) {
-				float thisDistSqr = (transform.position - enemy.transform.position).sqrMagnitude;
-				if (thisDistSqr < bestDistSqr) {
-					nearestEnemy = enemy;
-					bestDistSqr = thisDistSqr;
+		targetObject = target;
+		moveTo(targetObject.transform.position);
+	}
+
+	// Function to fire at the closest enemy if in range
+	void fireAtClosestEnemyInRange() {
+				
+		// If there is an enemy and they are in range, fire at the enemy
+		if (closestEnemy != null
+				&& closestEnemy.owner != owner
+				&& Vector3.SqrMagnitude(closestEnemy.transform.position - transform.position) <= range*range) {
+
+			// Create laser to visually represent damage being done
+			GameObject laserShotObj = new GameObject();
+			LaserShotScript laserShot = laserShotObj.AddComponent<LaserShotScript>();
+			laserShot.color = selectionCircle.GetComponent<Renderer>().material;
+			laserShot.origin = transform;
+			laserShot.destination = closestEnemy.transform;
+			laserShot.laserSpeed = 10f;
+			laserShot.laserLength = 0.5f;
+			laserShot.damage = damage;
+			laserShot.damageEvent = new DamageEvent();
+			laserShot.damageEvent.AddListener(closestEnemy.doDamage);
+		}
+	}
+
+	// Check for the most up to date closest enemy to target
+	void updateEnemySearch() {
+
+		// Find the closest enemy
+		Damageable[] allDamageables = (Damageable[])FindObjectsOfType(typeof(Damageable));
+		Damageable localClosestEnemy = null;
+		float closestDistance = 0;
+		foreach (Damageable damageable in allDamageables) {
+			if (damageable.owner != owner) {
+				float distance = Vector3.SqrMagnitude(damageable.transform.position - transform.position);
+				if (localClosestEnemy == null || distance < closestDistance) {
+					localClosestEnemy = damageable;
+					closestDistance = distance;
 				}
 			}
+		}
 
-			// Fire at the enemy
-			nearestEnemy.health -= 10f;
+		// If there is a closest enemy, keep track of it
+		// If on auto, move to this enemy
+		if (localClosestEnemy != null) {
+			closestEnemy = localClosestEnemy;
+			if (onAuto) {
+				moveTo(closestEnemy.gameObject);
+			}
 		}
 	}
 
